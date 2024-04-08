@@ -25,11 +25,63 @@ function fetchError(error) {
         payload: error
     }
 }
-
+// main data
 const fetchUsers = () => {
     return function (dispatch) {
         dispatch(fetchRequest())
         axios.get("http://localhost:3000/todos").then(res => {
+            const data = res.data
+            dispatch(fetchSuccess(data))
+        }).catch(err => {
+            dispatch(fetchError(err.message))
+        })
+    }
+}
+
+// delete user
+const id = 1;
+const fetchUsersDelete = () => {
+    return function (dispatch) {
+        dispatch(fetchRequest())
+        axios.delete(`http://localhost:3000/todos/${id}`).then(res => {
+            const data = res.data
+            dispatch(fetchSuccess(data))
+        }).catch(err => {
+            dispatch(fetchError(err.message))
+        })
+    }
+}
+
+// add new user
+const newUser = {
+    "userId": 1,
+    "id": '1',
+    "title": "delectus aut autem",
+    "completed": false
+}
+const fetchUsersAdd = () => {
+    return function (dispatch) {
+        dispatch(fetchRequest())
+        axios.post(`http://localhost:3000/todos`, newUser).then(res => {
+            const data = res.data
+            dispatch(fetchSuccess(data))
+        }).catch(err => {
+            dispatch(fetchError(err.message))
+        })
+    }
+}
+
+// edit user
+const editUser = {
+    "userId": 1,
+    "title": "edit user",
+    "completed": true
+}
+const editUserId = 1
+const fetchUsersEdit = () => {
+    return function (dispatch) {
+        dispatch(fetchRequest())
+        axios.put(`http://localhost:3000/todos/${editUserId}`, editUser).then(res => {
             const data = res.data
             dispatch(fetchSuccess(data))
         }).catch(err => {
@@ -70,4 +122,15 @@ const reducer = (state = initialState, action) => {
 const store = createStore(reducer, applyMiddleware(thunk))
 console.log("initial state", store.getState())
 store.subscribe(() => console.log("update state", store.getState()))
+
+// Create
+store.dispatch(fetchUsersAdd())
+
+// Read
 store.dispatch(fetchUsers())
+
+// Update
+store.dispatch(fetchUsersEdit())
+
+// Delete
+store.dispatch(fetchUsersDelete())
